@@ -15,7 +15,9 @@ kasih beberapa comment yak biar gampang dibaca
 
 nama file .ino disamain kayak tugasnya (misal rfid ya dinamain rfid.ino)
 
-deadline push ke sini tanggal 31
+// deadline push ke sini tanggal 31
+
+REVISI KARENA DEADLINE DIUNDUR JADI TANGGAL 2, MAKA DEADLINE PUSH KESINI TANGGAL 26
 
 Semangat UAS!!!
 
