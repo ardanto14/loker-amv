@@ -13,13 +13,11 @@ passive buzzer dan relay - dhafin
 
 kasih beberapa comment yak biar gampang dibaca
 
-nama file .ino disamain kayak tugasnya (misal rfid ya dinamain rfid.ino)
+nama file folder sketch dan .ino disamain kayak tugasnya (misal rfid, sketchnya dinamain rfid dan isinya rfid.ino)
 
-// deadline push ke sini tanggal 31
+yang di push kesini libraries (kalo download library dari luar) sama folder sketch (yang berisi file .ino)
 
-REVISI KARENA DEADLINE DIUNDUR JADI TANGGAL 2, MAKA DEADLINE PUSH KESINI TANGGAL 26
-
-Semangat UAS!!!
+deadline push kesini tanggal 26
 
 buat referensi
 
