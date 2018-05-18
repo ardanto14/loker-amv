@@ -17,7 +17,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void printHelloMessage();
 void printFailMessage();
-void printSuccessMessage(String name);
+void printSuccessMessage(uint8_t name[]);
 
 void setup()
 {
@@ -31,6 +31,11 @@ void setup()
 void loop()
 {
   // define this later
+  printHelloMessage();
+  delay(1000);
+  printFailMessage();
+  delay(1000);
+  printSuccessMessage((uint8_t) "ngetest");
 }
 
 /* method to print hello message to the lcd */
