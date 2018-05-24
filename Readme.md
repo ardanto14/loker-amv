@@ -32,3 +32,7 @@ passive buzzer
 
 relay
 - https://howtomechatronics.com/tutorials/arduino/control-high-voltage-devices-arduino-relay-tutorial/
+
+Flowchart
+
+![Flowchart](images/flowchart_loker-amv.png)
