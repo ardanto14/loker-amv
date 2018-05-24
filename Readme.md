@@ -1,5 +1,9 @@
 Loker AMV
 
+Flowchart
+
+![Flowchart](images/flowchart_loker-amv.png)
+
 RFID - gita
 - bikin kondisi berhasil dan ga
 - kartunya ada 15
@@ -32,7 +36,3 @@ passive buzzer
 
 relay
 - https://howtomechatronics.com/tutorials/arduino/control-high-voltage-devices-arduino-relay-tutorial/
-
-Flowchart
-
-![Flowchart](images/flowchart_loker-amv.png)
