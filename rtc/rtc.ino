@@ -1,48 +1,50 @@
+#include <LiquidCrystal_I2C.h>
 #include <Wire.h>
-#include <DS3231.h>
+#include "DS3231.h"
 
-DS3231 Clock;
-
-int Year;
-int Month;
-int Date;
-int DoW;
-int Hour;
-int Minute;
-int Second;
-
-bool Century = false;
-bool h12 = false;
-bool PM = false;
+RTClib RTC;
+DS3231 clocker;
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void setup () {
-    Clock.setClockMode(false);  // set to 24h
-    //setClockMode(true); // set to 12h
-
-    Clock.setYear(Year);
-    Clock.setMonth(Month);
-    Clock.setDate(Date);
-    Clock.setDoW(DoW);
-    Clock.setHour(Hour);
-    Clock.setMinute(Minute);
-    Clock.setSecond(Second);
+    Serial.begin(57600);
     Wire.begin();
+    lcd.begin();
+    lcd.backlight();
+    //clocker.setSecond(0);
+    //clocker.setMinute(13);
+    //clocker.setHour(22);
+    //clocker.setDate(28);
+    //clocker.setMonth(5);
+    //clocker.setYear(18);
+    //clocker.setDoW(1);
+    //clocker.setClockMode(false); // set to 24 h
 }
 
 void loop () {
-  
+    DateTime now = RTC.now();
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(now.year(), DEC);
+    lcd.print('/');
+    lcd.print(now.month(), DEC);
+    lcd.print('/');
+    lcd.print(now.day(), DEC);
+    lcd.setCursor(0, 1);
+    if (now.hour() < 10) {
+      lcd.print(0, DEC);
+    }
+    lcd.print(now.hour(), DEC);
+    lcd.print(':');
+    if (now.minute() < 10) {
+      lcd.print(0, DEC);
+    }
+    lcd.print(now.minute(), DEC);
+    lcd.print(':');
+    if (now.second() < 10) {
+      lcd.print(0, DEC);
+    }
+    lcd.print(now.second(), DEC);
+    Serial.println(now.second());
     delay(1000);
-  
-    Serial.print(Clock.getYear(), DEC);
-    Serial.print("-");
-    Serial.print(Clock.getMonth(Century), DEC);
-    Serial.print("-");
-    Serial.print(Clock.getDate(), DEC);
-    Serial.print(" ");
-    Serial.print(Clock.getHour(h12, PM), DEC); //24-hr
-    Serial.print(":");
-    Serial.print(Clock.getMinute(), DEC);
-    Serial.print(":");
-    Serial.println(Clock.getSecond(), DEC);
-    Clock.getDoW();
 }
