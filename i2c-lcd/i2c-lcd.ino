@@ -6,7 +6,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void printHelloMessage();
 void printFailMessage();
-void printSuccessMessage(uint8_t name[]);
+void printSuccessMessage(char name[]);
 
 void setup()
 {
@@ -50,7 +50,7 @@ void printFailMessage() {
 /* method to print success message to the lcd
  * receive param name in String to print it to lcd
 */
-void printSuccessMessage(uint8_t name[]) {
+void printSuccessMessage(char name[]) {
   uint8_t final[16]; // variable to be printed
   strcpy(final, "Hi, "); // copy message to row
   strcat(final, name); // concatenate message and name

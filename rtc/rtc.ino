@@ -7,10 +7,11 @@ DS3231 clocker;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void setup () {
-    Serial.begin(57600);
+    Serial.begin(9600);
     Wire.begin();
     lcd.begin();
     lcd.backlight();
+    // uncomment this if you want to set rtc clock
     //clocker.setSecond(0);
     //clocker.setMinute(13);
     //clocker.setHour(22);
@@ -45,6 +46,5 @@ void loop () {
       lcd.print(0, DEC);
     }
     lcd.print(now.second(), DEC);
-    Serial.println(now.second());
     delay(1000);
 }
