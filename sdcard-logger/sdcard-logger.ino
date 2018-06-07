@@ -33,7 +33,7 @@ void loop() {
 void printToLog(char username[]) {
   DateTime now = rtc.now();
   
-  SD.remove("log.txt"); // uncomment for the real code
+  SD.remove("test.txt"); // uncomment for the real code
   
   myFile = SD.open("log.txt", FILE_WRITE);
 
