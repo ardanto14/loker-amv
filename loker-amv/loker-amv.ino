@@ -110,121 +110,84 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   /* ------------------run mfrc522------------------------ */
-  MFRC522::MIFARE_Key key;
-  for (byte i = 0; i < 6; i++) key.keyByte[i] = 0xFF;
-  byte block;
-  byte len;
-  MFRC522::StatusCode status;
-  
-  if ( ! (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()))
-    Serial.println(F("TAP THE CARD"));
+  if (! (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial())) {
     printHelloMessage();
     return;
-
-  Serial.println(F("CARD DETECTED"));
-  mfrc522.PICC_DumpDetailsToSerial(&(mfrc522.uid));     //dump some details about the card
-  Serial.print(F("NAME: "));
-
-  byte buffer1[18];
-
-  block = 4;
-  len = 18;
-
-  status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, 4, &key, &(mfrc522.uid)); //line 834 of MFRC522.cpp file
-  if (status != MFRC522::STATUS_OK) 
-  {
-    Serial.print(F("AUTHENTICATION FAILED: "));
-    Serial.println(mfrc522.GetStatusCodeName(status));
-    printFailMessage();
-    buzzerSound(1);
-    return;
-  }
-  status = mfrc522.MIFARE_Read(block, buffer1, &len);
-  if (status != MFRC522::STATUS_OK) 
-  {
-    Serial.print(F("READING FAILED: "));
-    Serial.println(mfrc522.GetStatusCodeName(status));
-    printFailMessage();
-    buzzerSound(1);
-    return;
-  }
-
-  for (uint8_t i = 0; i < 16; i++)
-  {
-    if (buffer1[i] != 32)
-    {
-      Serial.write(buffer1[i]);
-    }
-  }
-  Serial.print(" ");
-  
-  byte buffer2[18];
-  block = 1;
-
-  status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, 1, &key, &(mfrc522.uid));
-  if (status != MFRC522::STATUS_OK) 
-  {
-    Serial.print(F("AUTHENTICATION FAILED: "));
-    Serial.println(mfrc522.GetStatusCodeName(status));
-    printFailMessage();
-    buzzerSound(1);
-    return;
-  }
-
-  status = mfrc522.MIFARE_Read(block, buffer2, &len);
-  if (status != MFRC522::STATUS_OK) {
-    Serial.print(F("READING FAILED: "));
-    Serial.println(mfrc522.GetStatusCodeName(status));
-    printFailMessage();
-    buzzerSound(1);
-    return;
   }
   
-  for (uint8_t i = 0; i < 16; i++) {
-    Serial.write(buffer2[i] );
-  }
-
   String content= "";
   byte letter;
+  
   for (byte i = 0; i < mfrc522.uid.size; i++) 
   {
      content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));
      content.concat(String(mfrc522.uid.uidByte[i], HEX));
   }
-  Serial.println();
-  Serial.print("Message : ");
+  
   content.toUpperCase();
-  if ((content.substring(1) == "F8 69 0F 89")||(content.substring(1) == "FA 92 E7 B6")||    //verify NUID AMV Member
-  (content.substring(1) == "CA 97 DF B6")||(content.substring(1) == "FA 96 DF B6")||
-  (content.substring(1) == "DA D1 D3 B6")||(content.substring(1) == "6A BE D1 B6")||
-  (content.substring(1) == "7A B7 B4 B3")||(content.substring(1) == "EA D8 D9 B6")||
-  (content.substring(1) == "0A D9 D9 B6")||(content.substring(1) == "EA 04 DB B6")||
-  (content.substring(1) == "CA 4D CF B6")||(content.substring(1) == "9A 51 D7 B6")||
-  (content.substring(1) == "7A 50 D7 B6")||(content.substring(1) == "DA E9 CD B6")||
-  (content.substring(1) == "9A F4 E6 B6")||(content.substring(1) == "5A D1 DD B6")||
-  (content.substring(1) == "D0 26 12 A3"))
-  {
-    Serial.println("IDENTIFICATION SUCCESS");           
-    Serial.println();
+
+  bool untapped = false;
+  DateTime now = RTC.now();
+  int startTime = now.unixtime();
+  int waitTime = startTime + 180;
+  if (cardIsValid(content.substring(1))) {
+    Serial.println("IDENTIFICATION SUCCESS");
     buzzerSound(3);
-    printSuccessMessage(userName[content.substring(1)]);
     printToLog(userName[content.substring(1)]);
     relayBoxOpen();
-    delay(3000);
-  }
- 
- else   {
+    printSuccessMessage(userName[content.substring(1)]);
+    while (true) {
+      while (! (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial())) {
+        now = RTC.now();
+        untapped = true;
+        if (now.unixTime() == waitTime) {
+          soundBuzzer(2);
+          startTime = now.unixtime();
+          waitTime = startTime + 180;
+          printUnlocked();
+        }
+      }
+      if (untapped) {
+        String newcontent= "";
+        byte newletter;
+        
+        for (byte i = 0; i < mfrc522.uid.size; i++) 
+        {
+          newcontent.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));
+          newcontent.concat(String(mfrc522.uid.uidByte[i], HEX));
+        }
+        if (newcontent.substring(1) == content.substring(1)) {
+          soundBuzzer(4);
+          printLocked();
+          relayBoxClose();
+          delay(5000);
+          return;
+        } else {
+          printFailMessage(0);
+        }
+      }
+    }
+  } else {
     Serial.println("IDENTIFICATION FAILED, TRY AGAIN");
-    printFailMessage();
     buzzerSound(1);
+    printFailMessage();
     delay(3000);
   }
-  
-  delay(1000);
-  mfrc522.PICC_HaltA();
-  mfrc522.PCD_StopCrypto1();
-
   /* ------------------------------------------ */
+}
+
+bool cardIsValid(String message) {
+  String uidList[] = {"F8 69 0F 89", "FA 92 E7 B6", "CA 97 DF B6",
+        "FA 96 DF B6", "DA D1 D3 B6", "6A BE D1 B6", "7A B7 B4 B3",
+        "EA D8 D9 B6", "0A D9 D9 B6", "EA 04 DB B6", "CA 4D CF B6",
+        "9A 51 D7 B6", "7A 50 D7 B6", "DA E9 CD B6", "9A F4 E6 B6",
+        "5A D1 DD B6", "D0 26 12 A3"};
+  for (int i = 0; i < 17; i++) {
+    if (message == uidList[i]) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /* method to print hello message to the lcd */
@@ -260,6 +223,26 @@ void printSuccessMessage(char name[]) {
   lcd.print((char*) final); // write message
   lcd.setCursor(0, 1); // set cursor to row 1 column 0
   lcd.print("Close after use"); // write message
+}
+
+
+/* method to print that locker is unlocked to the lcd */
+void printUnlocked() {
+  lcd.clear(); // clear the lcd
+  lcd.setCursor(0,0); // set cursor to row 0 column 0
+  lcd.print("Attention!"); // write message
+  lcd.setCursor(0, 1); // seet cursor to row 1 column 0
+  lcd.print("Locker is unlocked!"); // write message
+}
+
+
+/* method to print that locker is unlocked to the lcd */
+void printLocked() {
+  lcd.clear(); // clear the lcd
+  lcd.setCursor(0,0); // set cursor to row 0 column 0
+  lcd.print("Attention!"); // write message
+  lcd.setCursor(0, 1); // seet cursor to row 1 column 0
+  lcd.print("Locker is locked"); // write message
 }
 
 /* method for activate relays */
