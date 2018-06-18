@@ -2,23 +2,13 @@ Loker AMV
 
 Flowchart
 
-![Flowchart](flowchart_loker-amv.png)
+![Flowchart](flowchart_loker-amv.jpg)
 
-progress
-part kodingan yang sudah jadi
-- [x] rtc
-- [x] lcd
-- [ ] sd card logger
-- [x] buzzer
-- [x] relay
-- [x] rfid
+TODO LIST
+1. bikin array buat namanya biar lcd bisa ngeprint nama pemilik kartu
 
-part kodingan yang sudah ditest
-- [x] rtc
-- [x] lcd
-- [ ] sd card logger
-- [x] buzzer
-- [ ] relay
-- [ ] rfid
-
-setelah semua terceklist langsung buat main programnya
+2. tes kodingan, terutama rtc sama sd card adapter, jika gabisa ada beberapa opsi
+	- set cs low ketika mau dipake dan di high lagi ketika selesai
+	- tambah diode di miso sd card adapter
+	- tambah resistor 330 di miso sd card adapter
+	- tambah tri state buffer di miso sdcard adapter
