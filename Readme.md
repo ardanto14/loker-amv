@@ -11,3 +11,5 @@ TODO LIST
 	- tambah diode di miso sd card adapter
 	- tambah resistor 330 di miso sd card adapter
 	- tambah tri state buffer di miso sdcard adapter
+	
+2. cek dan tambahkan kodingan untuk mendefine kaki-kaki elektrik yang digunakan ke pin arduino
