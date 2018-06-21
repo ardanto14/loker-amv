@@ -114,8 +114,8 @@ void loop() {
   int waitTime = startTime + 180;
   if (cardIsValid(content.substring(1))) {
     Serial.println("IDENTIFICATION SUCCESS");
-    printToLog("aku");
-    printSuccessMessage("aku");
+    printToLog(getName(content.substring(1)));
+    printSuccessMessage(getName(content.substring(1)));
     relayBoxOpen();
     soundBuzzer(SUCCESS);
     delay(3000);
@@ -176,6 +176,26 @@ void loop() {
 }
 
 // --- helper method start here
+
+/* method for return the username based on uid number */
+String getName(String id) {
+  String uidList[] = {"F8 69 0F 89", "FA 92 E7 B6", "CA 97 DF B6",
+        "FA 96 DF B6", "DA D1 D3 B6", "6A BE D1 B6", "7A B7 B4 B3",
+        "EA D8 D9 B6", "0A D9 D9 B6", "EA 04 DB B6", "CA 4D CF B6",
+        "9A 51 D7 B6", "7A 50 D7 B6", "DA E9 CD B6", "9A F4 E6 B6",
+        "5A D1 DD B6", "D0 26 12 A3"};
+  String nameList[] = {"Alif", "Goldy", "Grace",
+        "Fikih", "Agoy", "Farol", "Muffin",
+        "Josu", "Auli", "Doni", "Fahmi",
+        "Irfan", "Suryadi", "Fajar", "Gita",
+        "Dhafin", "Danto"};
+  for (int i = 0; i < sizeof(uidList); i++) {
+    if (id == uidList[i]) {
+      return nameList[i];
+    }
+  }
+  return "unknown";
+}
 
 /* method to check if the given uid is valid */
 bool cardIsValid(String message) {
