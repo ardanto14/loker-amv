@@ -8,12 +8,12 @@
 bool cardIsValid(String message);
 void printHelloMessage();
 void printFailMessage();
-void printSuccessMessage(char name[]);
+void printSuccessMessage(String username);
 void printUnlocked();
 void printLocked();
 void relayBoxOpen();
 void relayBoxClose();
-void printToLog(char username[]);
+void printToLog(String username);
 void soundBuzzer(byte type);
 
 
@@ -22,6 +22,8 @@ void soundBuzzer(byte type);
 #define FAILED 101
 #define OPEN_LOCKER 102
 #define REMOVE_CARD 103
+#define OPEN 104
+#define CLOSE 105
 
 // pin for relay
 #define RELAY_PIN 23
@@ -114,7 +116,7 @@ void loop() {
   int waitTime = startTime + 180;
   if (cardIsValid(content.substring(1))) {
     Serial.println("IDENTIFICATION SUCCESS");
-    printToLog(getName(content.substring(1)));
+    printToLog(getName(content.substring(1)), OPEN);
     printSuccessMessage(getName(content.substring(1)));
     relayBoxOpen();
     soundBuzzer(SUCCESS);
@@ -154,6 +156,7 @@ void loop() {
       
       if (newcontent.substring(1) == content.substring(1)) {
         Serial.println("Locker successfully unlocked");
+        printToLog(getName(content.substring(1)), CLOSE);
         printLocked();
         relayBoxClose();
         soundBuzzer(REMOVE_CARD);
@@ -235,14 +238,14 @@ void printFailMessage() {
 /* method to print success message to the lcd
  * receive param name in String to print it to lcd
 */
-void printSuccessMessage(char name[]) {
-  uint8_t final[16]; // variable to be printed
-  strcpy(final, "Hi, "); // copy message to row
-  strcat(final, name); // concatenate message and name
-  strcat(final, "!");
+void printSuccessMessage(String username) {
+  String final = "Hi, " + username + "!"; // variable to be printed
+  //strcpy(final, "Hi, "); // copy message to row
+  //strcat(final, name); // concatenate message and name
+  //strcat(final, "!");
   lcd.clear(); // clear the lcd
   lcd.setCursor(0,0); // set cursor to row 0 column 0
-  lcd.print((char*) final); // write message
+  lcd.print(final); // write message
   lcd.setCursor(0, 1); // set cursor to row 1 column 0
   lcd.print("Close after use"); // write message
 }
@@ -278,7 +281,7 @@ void relayBoxClose() {
 }
 
 /* method to save the user log data */
-void printToLog(char username[]) {
+void printToLog(String username, byte type) {
   DateTime now = RTC.now();
   
   SD.remove("log.txt");
@@ -288,6 +291,11 @@ void printToLog(char username[]) {
   // if the file opened okay, write to it:
   if (myFile) {
     // writing file begin here
+    if (type == OPEN) {
+      myFile.print("OPEN ");
+    } else if (type == CLOSE) {
+      myFile.print("CLOSE ");
+    }
     myFile.print(now.year());
     myFile.print("-");
     myFile.print(now.month());
@@ -310,8 +318,8 @@ void printToLog(char username[]) {
     myFile.print(now.second());
     // close the file:
     myFile.print(" ");
-    myFile.println((char*) username);
-    myFile.close(); // dont forget to cloaw
+    myFile.println(username);
+    myFile.close(); // dont forget to close
   } else {
     Serial.println("Error writing");
   }
