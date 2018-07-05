@@ -11,9 +11,12 @@ kodingan terdiri 2 bagian
 kodingan loker-amv ga dipake
 
 list pin
-vcc semua ditaroh di 5v
-3.3v nya rfid taro di 3.3v
-gnd semua ditaroh di gnd
+
+- vcc semua ditaroh di 5v
+
+- 3.3v nya rfid taro di 3.3v
+
+- gnd semua ditaroh di gnd
 
 - rtc
 	- D di SDA (20)
