@@ -12,14 +12,14 @@ void setup () {
     lcd.begin();
     lcd.backlight();
     // uncomment this if you want to set rtc clock
-    //clocker.setSecond(0);
-    //clocker.setMinute(13);
-    //clocker.setHour(22);
-    //clocker.setDate(28);
-    //clocker.setMonth(5);
-    //clocker.setYear(18);
-    //clocker.setDoW(1);
-    //clocker.setClockMode(false); // set to 24 h
+    clocker.setSecond(0);
+    clocker.setMinute(13);
+    clocker.setHour(22);
+    clocker.setDate(28);
+    clocker.setMonth(5);
+    clocker.setYear(18);
+    clocker.setDoW(1);
+    clocker.setClockMode(false); // set to 24 h
 }
 
 void loop () {

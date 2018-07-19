@@ -8,8 +8,6 @@ kodingan terdiri 2 bagian
 - mainboard, untuk arduino mega
 - secondboard, untuk arduino nano
 
-kodingan loker-amv ga dipake
-
 list pin
 
 - vcc semua ditaroh di 5v
@@ -19,8 +17,8 @@ list pin
 - gnd semua ditaroh di gnd
 
 - rtc
-	- D di SDA (20)
-	- C di SCL (21)
+	- SDA di SDA (20)
+	- SCL di SCL (21)
 
 - lcd
 	- SDA di SDA (20)
@@ -46,4 +44,6 @@ list pin
 - tx1 (mega) sambung ke rx0 (nano), rx1 (mega) sambung ke tx1 (nano)
 
 - gnd nano sambung ke gnd mega
+
+- 5v sambung ke vin nano
 

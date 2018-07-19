@@ -9,7 +9,7 @@ bool cardIsValid(String message);
 void printHelloMessage();
 void printFailMessage();
 void printSuccessMessage(String username);
-void printUnlocked();
+void printUnlocked(String username);
 void printLocked();
 void relayBoxOpen();
 void relayBoxClose();
@@ -66,12 +66,12 @@ void setup() {
   /*------- for rtc -------*/
   // uncomment this if you want to set rtc clock
   //clocker.setSecond(0);
-  //clocker.setMinute(13);
-  //clocker.setHour(22);
-  //clocker.setDate(28);
-  //clocker.setMonth(5);
+  //clocker.setMinute(53);
+  //clocker.setHour(18);
+  //clocker.setDate(11);
+  //clocker.setMonth(7);
   //clocker.setYear(18);
-  //clocker.setDoW(1);
+  //clocker.setDoW(3);
   //clocker.setClockMode(false); // set to 24 h
 
   /*------- for buzzer -------*/
@@ -84,12 +84,10 @@ void setup() {
 
 void loop() {
   if (!mfrc522.PICC_IsNewCardPresent()) {
-    printHelloMessage();
     return;
   }
     
   if (!mfrc522.PICC_ReadCardSerial()) {
-    printHelloMessage();
     return;
   }
   
@@ -104,8 +102,8 @@ void loop() {
   content.toUpperCase();
 
   DateTime now = RTC.now();
-  int startTime = now.unixtime();
-  int waitTime = startTime + 180;
+  unsigned long startTime = now.unixtime();
+  unsigned long waitTime = startTime + 180;
   if (cardIsValid(content.substring(1))) {
     Serial.println("IDENTIFICATION SUCCESS");
     printToLog(getName(content.substring(1)), OPEN);
@@ -113,13 +111,13 @@ void loop() {
     relayBoxOpen();
     soundBuzzer(SUCCESS);
     delay(3000);
+    printUnlocked(getName(content.substring(1)));
     while (true) {
       if(!mfrc522.PICC_IsNewCardPresent()) {
         now = RTC.now();
         if (now.unixtime() >= waitTime) {
           startTime = now.unixtime();
           waitTime = startTime + 180;
-          printUnlocked();
           soundBuzzer(OPEN_LOCKER);
         }
         continue;
@@ -130,7 +128,6 @@ void loop() {
         if (now.unixtime() >= waitTime) {
           startTime = now.unixtime();
           waitTime = startTime + 180;
-          printUnlocked();
           soundBuzzer(OPEN_LOCKER);
         }
         continue;
@@ -152,13 +149,15 @@ void loop() {
         printLocked();
         relayBoxClose();
         soundBuzzer(REMOVE_CARD);
-        delay(3000);
+        delay(1000);
+        printHelloMessage();
         return;
       } else {
         Serial.println("Card is different");
         printFailMessage();
         soundBuzzer(FAILED);
-        delay(3000);
+        delay(1000);
+        printUnlocked(getName(content.substring(1)));
       }
 
     }
@@ -166,7 +165,8 @@ void loop() {
     Serial.println("IDENTIFICATION FAILED, TRY AGAIN");
     soundBuzzer(FAILED);
     printFailMessage();
-    delay(3000);
+    delay(1000);
+    printHelloMessage();
   }
 }
 
@@ -244,12 +244,12 @@ void printSuccessMessage(String username) {
 
 
 /* method to print that locker is unlocked to the lcd */
-void printUnlocked() {
+void printUnlocked(String username) {
   lcd.clear(); // clear the lcd
   lcd.setCursor(0,0); // set cursor to row 0 column 0
-  lcd.print("Attention!"); // write message
+  lcd.print("Unlocked by:"); // write message
   lcd.setCursor(0, 1); // seet cursor to row 1 column 0
-  lcd.print("Locker is unlocked!"); // write message
+  lcd.print(username); // write message
 }
 
 
@@ -257,9 +257,9 @@ void printUnlocked() {
 void printLocked() {
   lcd.clear(); // clear the lcd
   lcd.setCursor(0,0); // set cursor to row 0 column 0
-  lcd.print("Attention!"); // write message
-  lcd.setCursor(0, 1); // seet cursor to row 1 column 0
   lcd.print("Locker is locked"); // write message
+  lcd.setCursor(0, 1); // seet cursor to row 1 column 0
+  lcd.print("Thanks for using"); // write message
 }
 
 /* method for activate relays */
@@ -304,12 +304,14 @@ void printToLog(String username, byte type) {
   Serial1.print(now.second());
   Serial1.print(" ");
   Serial1.println(username);
+  if (type == CLOSE) {
+    Serial1.println("-----");
+  }
 }
 
 /* method for setting the buzzer sound */
 void soundBuzzer(byte type) {
   if (type == SUCCESS) {
-    // for success
     for (int y = 0; y < 3; y++){
       digitalWrite(BUZZER_PIN, HIGH) ;// Buzzer On
       delay(50) ;// Delay 1ms 
@@ -317,7 +319,6 @@ void soundBuzzer(byte type) {
       delay(50) ;// delay 1ms
       }
   } else if (type == FAILED) {
-    // for failed
     for (int y = 0; y < 1; y++){
       digitalWrite(BUZZER_PIN, HIGH) ;// Buzzer On
       delay(1000) ;// Delay 1ms 
@@ -325,7 +326,6 @@ void soundBuzzer(byte type) {
       delay(1000) ;// delay 1ms
       }
   } else if (type == OPEN_LOCKER) {
-    // for opening locker
     for (int y = 0; y < 2; y++){
       digitalWrite(BUZZER_PIN, HIGH) ;// Buzzer On
       delay(100) ;// Delay 1ms 
@@ -333,7 +333,6 @@ void soundBuzzer(byte type) {
       delay(100) ;// delay 1ms
       }
   } else if (type == REMOVE_CARD) {
-    // for remove card
     for (int y = 0; y < 4; y++){
       digitalWrite(BUZZER_PIN, HIGH) ;// Buzzer On
       delay(150) ;// Delay 1ms 
